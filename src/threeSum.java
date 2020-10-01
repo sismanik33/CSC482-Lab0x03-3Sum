@@ -6,24 +6,26 @@ import java.util.Set;
 
 public class threeSum {
     public static void main(String[] args) {
-        int[] array = {-10,-8,-5,-3,-1,2,3,5,7,8,9,10,12,-15,33,-37,25,-29,30,33,-31,-41,43,-45,47,55,-53,47,-54,55,-61};
+//        int[] array = {-10,-8,-5,-3,-1,2,3,5,7,8,9,10,12,-15,33,-37,25,-29,30,33,-31,-41,43,-45,47,55,-53,47,-54,55,-61};
 //        int[] array = {1,2,3,5,7,8,9,10};
 //        int[] array = {-10,-8,-5,-3,-1,-2,-3,-5,-7,8,-9,-10};
+        int[] array = GenerateTestList(100);
+
 
         ArrayList<int[]> result;
-//        result = Brute3Sum(array);
-//        if(result.isEmpty()){
-//            System.out.println("list does not contain 3 ints that sum to 0");
-//        } else {
-//            PrintSolutions(result);
-//        }
-//
-//        result = Faster3Sum(array);
-//        if(result.isEmpty()){
-//            System.out.println("list does not contain 3 ints that sum to 0");
-//        } else {
-//            PrintSolutions(result);
-//        }
+        result = Brute3Sum(array);
+        if(result.isEmpty()){
+            System.out.println("list does not contain 3 ints that sum to 0");
+        } else {
+            PrintSolutions(result);
+        }
+
+        result = Faster3Sum(array);
+        if(result.isEmpty()){
+            System.out.println("list does not contain 3 ints that sum to 0");
+        } else {
+            PrintSolutions(result);
+        }
 
         result = Fastest3Sum(array);
         if(result.isEmpty()){
@@ -43,8 +45,8 @@ public class threeSum {
                 else
                     System.out.print(tmp[j] + ",");
             }
-
         }
+        System.out.println();
     }
     
     public static ArrayList<int[]> Brute3Sum (int[] arr){       //N^3
@@ -101,10 +103,11 @@ public class threeSum {
                     else if (arr[i] + arr[left] + arr[right] < 0)
                         left++;
                     else {
-                        System.out.println("Fastest found triplet: " + arr[i] +arr[right] + arr[left]);
                         int[] tmp = {arr[i], arr[right], arr[left]};
                         triplets.add(tmp);
                         numSolutions++;
+                        right--;
+                        left++;
                     }
                 }
         }
@@ -129,6 +132,16 @@ public class threeSum {
             }
         }
         return -1;
+    }
+
+    public static int[] GenerateTestList(int N){
+        int[] list = new int[N];
+        int min = -3 * N;
+        int max = 3 * N;
+        for (int i = 0; i < N; i++) {
+            list[i] = (int) (Math.random() * (max - min)) + min;
+        }
+        return list;
     }
     
 }
