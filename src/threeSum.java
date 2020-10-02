@@ -1,16 +1,17 @@
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 public class threeSum {
+        public static int MAX_N = 8000000;
+        public static int MAX_TESTS = 20;
+
     public static void main(String[] args) {
 //        int[] array = {-10,-8,-5,-3,-1,2,3,5,7,8,9,10,12,-15,33,-37,25,-29,30,33,-31,-41,43,-45,47,55,-53,47,-54,55,-61};
 //        int[] array = {1,2,3,5,7,8,9,10};
 //        int[] array = {-10,-8,-5,-3,-1,-2,-3,-5,-7,8,-9,-10};
-        int[] array = GenerateTestList(100);
-
+        int[] array = GenerateTestList(20);
 
         ArrayList<int[]> result;
         result = Brute3Sum(array);
@@ -37,13 +38,13 @@ public class threeSum {
 
     public static void PrintSolutions(ArrayList<int[]> solutionList){
         for (int i = 0; i < solutionList.size(); i++) {
-            int[] tmp = solutionList.get(i);
+            int[] tempTriplet = solutionList.get(i);
             System.out.print("[");
             for (int j = 0; j < 3; j++) {
                 if (j == 2)
-                    System.out.print(tmp[j] + "] ");
+                    System.out.print(tempTriplet[j] + "] ");
                 else
-                    System.out.print(tmp[j] + ",");
+                    System.out.print(tempTriplet[j] + ",");
             }
         }
         System.out.println();
@@ -58,8 +59,9 @@ public class threeSum {
             for (int j = i+1; j < n; j++) {
                 for (int k = j+1; k < n; k++) {
                     if (arr[i] + arr[j] + arr[k] == 0) {
-                        int[] tmp = {arr[i], arr[j], arr[k]};
-                        triplets.add(tmp);
+                        int[] tempTriplet = {arr[i], arr[j], arr[k]};
+//                        Arrays.sort(tempTriplet);
+                        triplets.add(tempTriplet);
                         numSolutions++;
                     }
                 }
@@ -74,13 +76,14 @@ public class threeSum {
         int n = arr.length;
         ArrayList<int[]> triplets = new ArrayList<int[]>();
         int numSolutions = 0;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n - 1; i++) {
             for (int j = i+1; j < n; j++) {
                 int remainingInt = -(arr[i] + arr[j]);
                 int checkIndex = BinarySearch(arr, remainingInt);
                 if (checkIndex != -1 && arr[checkIndex] > arr[j]){//find index if val exists and make sure it's not a duplicate permutation
-                    int[] tmp = {arr[i], arr[j], arr[checkIndex]};
-                    triplets.add(tmp);
+                    int[] tempTriplet = {arr[i], arr[j], arr[checkIndex]};
+//                    Arrays.sort(tempTriplet);
+                    triplets.add(tempTriplet);
                     numSolutions++;
                 }
             }
@@ -103,8 +106,9 @@ public class threeSum {
                     else if (arr[i] + arr[left] + arr[right] < 0)
                         left++;
                     else {
-                        int[] tmp = {arr[i], arr[right], arr[left]};
-                        triplets.add(tmp);
+                        int[] tempTriplet = {arr[i], arr[right], arr[left]};
+//                        Arrays.sort(tempTriplet);
+                        triplets.add(tempTriplet);
                         numSolutions++;
                         right--;
                         left++;
@@ -143,5 +147,49 @@ public class threeSum {
         }
         return list;
     }
-    
+
+    public static void SetupTests(){
+        //int[] currentAlgorithmToTest = {0,1,2}; //BruteForce, Faster, Fastest
+        int[] currTime = new int[3];
+        int[] prevTime = new int[3];
+        int[] expectedDoubling = new int[3];
+
+        System.out.format("%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n","", "Brute 3 Sum","Doubling", "Exp Doubling", "Faster ", "Doubling", "Exp Doubling", "Fastest ", "Doubling", "Exp Doubling");
+        System.out.format("%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n","N",     "Time",     "Ratio",     "Ratio",   "3 Sum Time",  "Ratio",       "Ratio", "3 Sum Time", "Ratio",       "Ratio");
+
+        for (int N = 2; N < MAX_N; N++) {
+            for (int i = 0; i < 3; i++) {
+                currTime[i] = RunTimingTest(N, i);
+            }
+
+
+        }
+    }
+
+    public static int RunTimingTest(int N, int algoToRun){
+        if(algoToRun == 0){
+            int testsRun = 0;
+            int cumulativeTime = 0;
+            while (testsRun < MAX_TESTS){
+                int[] testList = GenerateTestList(N);
+
+
+            }
+
+
+        } else if (algoToRun == 1){
+
+        } else {
+
+        }
+        return -1;
+    }
+
+    /** Get CPU time in nanoseconds since the program(thread) started. */
+    /** from: http://nadeausoftware.com/articles/2008/03/java_tip_how_get_cpu_and_user_time_benchmarking#TimingasinglethreadedtaskusingCPUsystemandusertime **/
+    public static long getCpuTime( ) {
+        ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+        return bean.isCurrentThreadCpuTimeSupported( ) ?
+                bean.getCurrentThreadCpuTime( ) : 0L;
+    }
 }
