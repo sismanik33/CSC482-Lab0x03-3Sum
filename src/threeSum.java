@@ -6,34 +6,34 @@ import java.util.*;
 public class threeSum {
         public static int MAX_N = 8000000;
         public static int MAX_TESTS = 20;
-
+        public static long MAX_TEST_TIME = 1000000000000L; //1000 seconds
     public static void main(String[] args) {
 //        int[] array = {-10,-8,-5,-3,-1,2,3,5,7,8,9,10,12,-15,33,-37,25,-29,30,33,-31,-41,43,-45,47,55,-53,47,-54,55,-61};
 //        int[] array = {1,2,3,5,7,8,9,10};
 //        int[] array = {-10,-8,-5,-3,-1,-2,-3,-5,-7,8,-9,-10};
-        int[] array = GenerateTestList(20);
-
-        ArrayList<int[]> result;
-        result = Brute3Sum(array);
-        if(result.isEmpty()){
-            System.out.println("list does not contain 3 ints that sum to 0");
-        } else {
-            PrintSolutions(result);
-        }
-
-        result = Faster3Sum(array);
-        if(result.isEmpty()){
-            System.out.println("list does not contain 3 ints that sum to 0");
-        } else {
-            PrintSolutions(result);
-        }
-
-        result = Fastest3Sum(array);
-        if(result.isEmpty()){
-            System.out.println("list does not contain 3 ints that sum to 0");
-        } else {
-            PrintSolutions(result);
-        }
+//        int[] array = GenerateTestList(20);
+//        ArrayList<int[]> result;
+//        result = Brute3Sum(array);
+//        if(result.isEmpty()){
+//            System.out.println("list does not contain 3 ints that sum to 0");
+//        } else {
+//            PrintSolutions(result);
+//        }
+//
+//        result = Faster3Sum(array);
+//        if(result.isEmpty()){
+//            System.out.println("list does not contain 3 ints that sum to 0");
+//        } else {
+//            PrintSolutions(result);
+//        }
+//
+//        result = Fastest3Sum(array);
+//        if(result.isEmpty()){
+//            System.out.println("list does not contain 3 ints that sum to 0");
+//        } else {
+//            PrintSolutions(result);
+//        }
+        SetupTests();
     }
 
     public static void PrintSolutions(ArrayList<int[]> solutionList){
@@ -67,7 +67,7 @@ public class threeSum {
                 }
             }
         }
-        System.out.println("Brute force: " + numSolutions);
+//        System.out.println("Brute force: " + numSolutions);
         return triplets;
     }
 
@@ -88,7 +88,7 @@ public class threeSum {
                 }
             }
         }
-        System.out.println("Faster found: " + numSolutions);
+//        System.out.println("Faster found: " + numSolutions);
         return triplets;
     }
 
@@ -115,7 +115,7 @@ public class threeSum {
                     }
                 }
         }
-        System.out.println("Fastest found: " + numSolutions);
+//        System.out.println("Fastest found: " + numSolutions);
         return triplets;
     }
 
@@ -150,39 +150,106 @@ public class threeSum {
 
     public static void SetupTests(){
         //int[] currentAlgorithmToTest = {0,1,2}; //BruteForce, Faster, Fastest
-        int[] currTime = new int[3];
-        int[] prevTime = new int[3];
-        int[] expectedDoubling = new int[3];
+        long[] currTime = new long[3];
+        String[] currTimeStr = new String[3];
+        String[] doublingTimeStr = new String[3];
+        long[] prevTime = {1,1,1};
+        double[] expectedDoubling = new double[3];
+        boolean[] stopTesting = {false,false,false};
+
+        expectedDoubling[0] = 8;  //N^3
+        expectedDoubling[2] = 4 ; //N^2
 
         System.out.format("%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n","", "Brute 3 Sum","Doubling", "Exp Doubling", "Faster ", "Doubling", "Exp Doubling", "Fastest ", "Doubling", "Exp Doubling");
         System.out.format("%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n","N",     "Time",     "Ratio",     "Ratio",   "3 Sum Time",  "Ratio",       "Ratio", "3 Sum Time", "Ratio",       "Ratio");
 
-        for (int N = 2; N < MAX_N; N++) {
+        for (int N = 4; N < MAX_N; N *= 2) {
             for (int i = 0; i < 3; i++) {
-                currTime[i] = RunTimingTest(N, i);
+                if(stopTesting[i] == false) {
+                    currTime[i] = RunTimingTest(N, i);
+                    currTimeStr[i] = String.valueOf(currTime[i]);
+                    if (currTime[i] > MAX_TEST_TIME)
+                        stopTesting[i] = true;
+                } else{
+                    currTime[i] = -1;
+                }
+                expectedDoubling[1] = ((N*N) * (Math.log(N) /Math.log(2) )) / ( (N/2)*(N/2) * ( Math.log(N/2) / Math.log(2) ) );//N^2 log N;
             }
-
-
+            if(N == 4)
+                System.out.format("%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n", N, currTime[0], "NA", expectedDoubling[0], currTime[1], "NA", expectedDoubling[1], currTime[2], "NA", expectedDoubling[2]);
+            else {
+                System.out.format("%15s", N);
+                if ( currTime[0] > -1 ) {
+                    float doubleTime = (float)currTime[0]/(float)prevTime[0];
+                    System.out.format("%15s%15f%15s", currTime[0], doubleTime, expectedDoubling[0]);
+                }
+                else
+                    System.out.format("%15s%15s%15s", "NA", "NA", "NA");
+                if ( currTime[1] > -1 ) {
+                    float doubleTime = (float)currTime[1]/(float)prevTime[1];
+                    System.out.format("%15s%15f%15.5f", currTime[1], doubleTime, expectedDoubling[1]);
+                }
+                else
+                    System.out.format("%15s%15s%15s", "NA", "NA", "NA");
+                if ( currTime[2] > -1 ) {
+                    float doubleTime = (float)currTime[2]/(float)prevTime[2];
+                    System.out.format("%15s%15f%15s\n", currTime[2], doubleTime, expectedDoubling[2]);
+                }
+                else
+                    System.out.format("%15s%15s%15s", "NA", "NA", "NA");
+            }
+            for (int i = 0; i < 3; i++) {
+                prevTime[i] = currTime[i];
+            }
         }
     }
 
-    public static int RunTimingTest(int N, int algoToRun){
+    public static long RunTimingTest(int N, int algoToRun){
+        int testsRun = 0;
+        long cumulativeTime = 0;
+        boolean continueTests = true;
+        long averageTime;
         if(algoToRun == 0){
-            int testsRun = 0;
-            int cumulativeTime = 0;
-            while (testsRun < MAX_TESTS){
+            while (testsRun < MAX_TESTS && continueTests){
                 int[] testList = GenerateTestList(N);
-
-
+                long before = getCpuTime();
+                ArrayList<int[]> results = Brute3Sum(testList);
+                long after = getCpuTime();
+                long currTime = after - before;
+                cumulativeTime += currTime;
+                testsRun++;
+                if (currTime > MAX_TEST_TIME)
+                    continueTests = false;
             }
-
-
+            averageTime = cumulativeTime/testsRun;
         } else if (algoToRun == 1){
-
+            while (testsRun < MAX_TESTS && continueTests){
+                int[] testList = GenerateTestList(N);
+                long before = getCpuTime();
+                ArrayList<int[]> results = Faster3Sum(testList);
+                long after = getCpuTime();
+                long currTime = after - before;
+                cumulativeTime += currTime;
+                testsRun++;
+                if (currTime > MAX_TEST_TIME)
+                continueTests = false;
+            }
+            averageTime = cumulativeTime/testsRun;
         } else {
-
+            while (testsRun < MAX_TESTS && continueTests){
+                int[] testList = GenerateTestList(N);
+                long before = getCpuTime();
+                ArrayList<int[]> results = Fastest3Sum(testList);
+                long after = getCpuTime();
+                long currTime = after - before;
+                cumulativeTime += currTime;
+                testsRun++;
+                if (currTime > MAX_TEST_TIME)
+                continueTests = false;
+            }
+            averageTime = cumulativeTime/testsRun;
         }
-        return -1;
+        return averageTime;
     }
 
     /** Get CPU time in nanoseconds since the program(thread) started. */
